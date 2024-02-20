@@ -2,7 +2,7 @@ import requests
 import json
 
 
-def fetch(url, token, post=False, get=False, delete=False, data=None):
+def fetch(url, token, post=False, get=False, delete=False, put=False, data=None):
     baseURL = "https://discordapp.com/api/" + url
 
     headers = {"Authorization": "Bot {}".format(token),
@@ -15,6 +15,8 @@ def fetch(url, token, post=False, get=False, delete=False, data=None):
         re = requests.get(baseURL, headers=headers)
     if delete:
         re = requests.delete(baseURL, headers=headers)
+    if put:
+        re = requests.put(baseURL, headers=headers)
 
     return re
 
@@ -32,9 +34,14 @@ class Discord(object):
         fetch(baseURL, token=self.obj[0], post=True, data=postedjson)
 
     def kickMember(self):
-        baseURL = "guilds/{}/members/{}".format(self.obj[1], self.userID)
+        memberRoleId = "764581718996156477"
+        probatedRoleId = "1208452389196140574"
+        baseURL = "guilds/{}/members/{}/roles/".format(self.obj[1], self.userID)
         if self.checkIfUserExists():
-            re = fetch(baseURL, token=self.obj[0], delete=True)
+            removeRoleURL = baseURL + memberRoleId
+            re = fetch(removeRoleURL, token=self.obj[0], delete=True)
+            addRoleURL = baseURL + probatedRoleId
+            re = fetch(addRoleURL, token=self.obj[0], put=True)
 
     def removeMemberRole(self):
         baseURL = "guilds/{}/members/{}/roles/{}".format(self.obj[1], self.userID, self.obj[3])
